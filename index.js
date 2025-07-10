@@ -73,5 +73,21 @@ app.get('/', (req, res) => {
   </html>`);
 });
 
+app.get('/api/hello', (req, res) => {
+  // ...existing API key logic...
+  if (!['123456789', '987654321'].includes(req.headers['x-api-key'])) {
+    return res.status(401).json({ error: 'Invalid or missing API key' });
+  }
+  // Log the request/response to ReadMe (requires your project API Key)
+  readme.log(process.env.README_API_KEY, req, res, {
+    apiKey: req.headers['x-api-key'],
+    label: 'Owlberto',
+    email: 'owlberto@readme.com',
+  });
+  res.json({
+    message: `Hello, developer! Your key ${req.headers['x-api-key']} is valid.`,
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
