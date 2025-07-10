@@ -126,6 +126,12 @@ app.get('/api/status', apiKeyCheck, (req, res) => {
   });
 });
 
+app.get('/api/error', apiKeyCheck, (req, res) => {
+  logApiCall(req, res);
+  // Simulate a server error
+  res.status(500).json({ error: 'Something went wrong on the server.' });
+});
+
 // -----------------------------
 
 const PORT = process.env.PORT || 3000;
