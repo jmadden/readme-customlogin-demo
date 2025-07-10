@@ -6,6 +6,9 @@ const app = express();
 
 app.use(express.json({ type: 'application/json' }));
 
+// -----------------------------
+// Personalized Docs Webhook
+// -----------------------------
 app.post('/webhook', async (req, res) => {
   const signature = req.headers['readme-signature'];
   const secret = process.env.README_WEBHOOK_SECRET;
@@ -16,7 +19,7 @@ app.post('/webhook', async (req, res) => {
     return res.status(401).json({ error: e.message });
   }
 
-  // For demo, always return mocked personalized data
+  // Mocked personalized data
   return res.json({
     name: 'Owlberto',
     email: req.body.email || 'owlberto@readme.com',
@@ -35,35 +38,34 @@ app.post('/webhook', async (req, res) => {
       { name: 'Demo API', url: 'https://readme-customlogin-demo.onrender.com' },
     ],
     avatar: 'https://placekitten.com/64/64',
-    // Add any other user info or variables you want!
   });
 });
 
+// -----------------------------
+// Custom Login
+// -----------------------------
 app.get('/login', (req, res) => {
-  // This is your fake, static user for the demo
   const user = {
     name: 'Owlberto',
     email: 'owlberto@readme.com',
-    // allowedProjects and redirect_url are optional, but shown for completeness
-    allowedProjects: ['your-readme-project'], // use your real project slug if needed
-    redirect_url: '/jm-guides/docs/getting-started', // docs path after login, can customize
-    api_key: 'api-key-12345-1', // demo, only if you want it prefilled in API Explorer
-    version: 1, // REQUIRED by ReadMe
+    allowedProjects: ['your-readme-project'],
+    redirect_url: '/jm-guides/docs/getting-started',
+    api_key: 'api-key-12345-1',
+    version: 1,
   };
 
-  // Sign the JWT with your ReadMe JWT secret
   const auth_token = jwt.sign(user, process.env.README_JWT_SECRET);
 
-  // Build the redirect URL
   const targetUrl = `${
     process.env.README_HUB_URL
   }?auth_token=${auth_token}&redirect=${encodeURIComponent(user.redirect_url)}`;
 
-  // Redirect user to ReadMe, logging them in
   return res.redirect(targetUrl);
 });
 
-// Optional: serve a basic HTML button for logging in (for demo UX)
+// -----------------------------
+// Demo Login Page
+// -----------------------------
 app.get('/', (req, res) => {
   res.send(`<html>
     <body>
@@ -75,21 +77,56 @@ app.get('/', (req, res) => {
   </html>`);
 });
 
-app.get('/api/hello', (req, res) => {
-  // ...existing API key logic...
-  if (!['123456789', '987654321'].includes(req.headers['x-api-key'])) {
+// -----------------------------
+// Centralized API Key Middleware
+// -----------------------------
+const validKeys = ['123456789', '987654321'];
+function apiKeyCheck(req, res, next) {
+  const apiKey = req.headers['x-api-key'];
+  if (!validKeys.includes(apiKey)) {
     return res.status(401).json({ error: 'Invalid or missing API key' });
   }
-  // Log the request/response to ReadMe (requires your project API Key)
+  req.apiKey = apiKey; // Attach for later use/logging
+  next();
+}
+
+// -----------------------------
+// Demo API Endpoints (all logged)
+// -----------------------------
+function logApiCall(req, res) {
   readme.log(process.env.README_API_KEY, req, res, {
-    apiKey: req.headers['x-api-key'],
-    label: 'Owlberto',
+    apiKey: req.apiKey,
+    label: `API Key: ${req.apiKey}`,
     email: 'owlberto@readme.com',
   });
+}
+
+app.get('/api/hello', apiKeyCheck, (req, res) => {
+  logApiCall(req, res);
   res.json({
-    message: `Hello, developer! Your key ${req.headers['x-api-key']} is valid.`,
+    message: `Hello, developer! Your key ${req.apiKey} is valid.`,
   });
 });
+
+app.get('/api/data', apiKeyCheck, (req, res) => {
+  logApiCall(req, res);
+  res.json({
+    data: [1, 2, 3, 4],
+    requestedBy: req.apiKey,
+    description: 'Sample data array',
+  });
+});
+
+app.get('/api/status', apiKeyCheck, (req, res) => {
+  logApiCall(req, res);
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    apiKeyUsed: req.apiKey,
+  });
+});
+
+// -----------------------------
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
