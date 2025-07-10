@@ -104,7 +104,7 @@ function logApiCall(req, res) {
 app.get('/api/hello', apiKeyCheck, (req, res) => {
   logApiCall(req, res);
   res.json({
-    message: `Hello, ${req.name}! Your key ${req.apiKey} is valid.`,
+    message: `Hello, ${req.user.name}! Your key ${req.apiKey} is valid.`,
   });
 });
 
