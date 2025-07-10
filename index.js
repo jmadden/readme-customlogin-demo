@@ -31,7 +31,9 @@ app.post('/webhook', async (req, res) => {
         apiKey: '987654321',
       },
     ],
-    servers: [{ name: 'Production API', url: 'https://api.triflecode.dev' }],
+    servers: [
+      { name: 'Demo API', url: 'https://readme-customlogin-demo.onrender.com' },
+    ],
     avatar: 'https://placekitten.com/64/64',
     // Add any other user info or variables you want!
   });
