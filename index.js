@@ -22,10 +22,13 @@ app.post('/webhook', async (req, res) => {
     email: req.body.email || 'owlberto@readme.com',
     keys: [
       {
-        key: 'api-key-12345-1',
-        name: 'Demo API Key',
+        name: 'API Key - Server East',
         apiKey: '123456789',
-        preview: true,
+        pass: 'hamburger',
+      },
+      {
+        name: 'API Key - Server West',
+        apiKey: '987654321',
       },
     ],
     servers: [{ name: 'Production API', url: 'https://api.triflecode.dev' }],
