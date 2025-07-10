@@ -20,7 +20,14 @@ app.post('/webhook', async (req, res) => {
   return res.json({
     name: 'Owlberto',
     email: req.body.email || 'owlberto@readme.com',
-    keys: [{ key: 'api-key-12345-1', name: 'Demo API Key', preview: true }],
+    keys: [
+      {
+        key: 'api-key-12345-1',
+        name: 'Demo API Key',
+        apiKey: '123456789',
+        preview: true,
+      },
+    ],
     servers: [{ name: 'Production API', url: 'https://api.triflecode.dev' }],
     avatar: 'https://placekitten.com/64/64',
     // Add any other user info or variables you want!
