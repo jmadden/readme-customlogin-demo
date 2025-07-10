@@ -1,8 +1,31 @@
 require('dotenv').config();
 const express = require('express');
 const jwt = require('jsonwebtoken');
-
+const readme = require('readmeio');
 const app = express();
+
+app.use(express.json({ type: 'application/json' }));
+
+app.post('/webhook', async (req, res) => {
+  const signature = req.headers['readme-signature'];
+  const secret = process.env.README_WEBHOOK_SECRET;
+
+  try {
+    readme.verifyWebhook(req.body, signature, secret);
+  } catch (e) {
+    return res.status(401).json({ error: e.message });
+  }
+
+  // For demo, always return mocked personalized data
+  return res.json({
+    name: 'Owlberto',
+    email: req.body.email || 'owlberto@readme.com',
+    keys: [{ key: 'api-key-12345-1', name: 'Demo API Key', preview: true }],
+    servers: [{ name: 'Production API', url: 'https://api.triflecode.dev' }],
+    avatar: 'https://placekitten.com/64/64',
+    // Add any other user info or variables you want!
+  });
+});
 
 app.get('/login', (req, res) => {
   // This is your fake, static user for the demo
