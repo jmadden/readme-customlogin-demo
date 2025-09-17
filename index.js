@@ -98,7 +98,8 @@ const clients = new Map([
       client_id: process.env.DEMO_CLIENT_ID || 'demo-client',
       client_secret: process.env.DEMO_CLIENT_SECRET || 'demo-secret',
       redirect_uris: [
-        process.env.DEMO_REDIRECT_URI || 'http://localhost:3000/oauth/callback',
+        process.env.DEMO_REDIRECT_URI ||
+          'http://docs.triflecode.dev/oauth/callback',
       ],
       // which scopes a client can request via client_credentials
       cc_allowed_scopes: ['widgets:admin', 'read:widgets'],
